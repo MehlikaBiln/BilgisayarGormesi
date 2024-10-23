@@ -1,0 +1,54 @@
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Görüntü dosyasını yükle
+image_path = r"C:\\C\\Adsiz.png"
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+if image is None:
+    raise FileNotFoundError(f"Görüntü dosyası bulunamadı: {image_path}")
+
+# Yatay türev filtresi [-1, 1]
+horizontal_kernel = np.array([[-1, 1]])
+
+# Dikey türev filtresi [[-1], [1]]
+vertical_kernel = np.array([[-1], [1]])
+
+# Yatay türev (cv2.filter2D ile korrelasyon yapılıyor)
+horizontal_derivative = cv2.filter2D(image, -1, horizontal_kernel)
+
+# Dikey türev (cv2.filter2D ile korrelasyon yapılıyor)
+vertical_derivative = cv2.filter2D(image, -1, vertical_kernel)
+
+# Yatay ve dikey türevleri birleştirme (kenarları daha iyi görmek için)
+combined_derivative = cv2.addWeighted(horizontal_derivative, 0.5, vertical_derivative, 0.5, 0)
+
+# Sonuçları gösterme
+plt.figure(figsize=(15, 5))
+
+# Orijinal görüntü
+plt.subplot(1, 3, 1)
+plt.title("Orijinal Görüntü")
+plt.imshow(image, cmap='gray')
+plt.axis("off")
+
+# Yatay türev sonucu
+plt.subplot(1, 3, 2)
+plt.title("Yatay Türev (Kenarlar)")
+plt.imshow(horizontal_derivative, cmap='gray')
+plt.axis("off")
+
+# Dikey türev sonucu
+plt.subplot(1, 3, 3)
+plt.title("Dikey Türev (Kenarlar)")
+plt.imshow(vertical_derivative, cmap='gray')
+plt.axis("off")
+
+# Kenarları birleştirerek gösterme
+plt.figure(figsize=(5, 5))
+plt.title("Birleştirilmiş Türev (Yatay + Dikey)")
+plt.imshow(combined_derivative, cmap='gray')
+plt.axis("off")
+
+plt.show()
